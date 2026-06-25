@@ -99,6 +99,27 @@ export function augmentedPath(): string {
   return parts.join(delimiter);
 }
 
+/**
+ * Sandbox-safe HuggingFace cache defaults.
+ *
+ * The on-device `sigit` agent redirects its model cache into a macOS App Group
+ * container (`~/Library/Group Containers/group.com.ondeinference.apps/…`) so it
+ * can share weights with the Onde Inference desktop app. That container is only
+ * writable by processes carrying the matching App Group entitlement; a `sigit`
+ * spawned by VS Code has none, so model downloads fail with EPERM ("Operation
+ * not permitted", os error 1). Pointing HF_HOME / HF_HUB_CACHE at the standard
+ * per-user cache keeps downloads in a directory the editor's child process can
+ * actually write to. These are *defaults* — a real env var or an agent's `env`
+ * entry still wins (see AcpClient.spawn).
+ */
+export function defaultModelCacheEnv(): Record<string, string> {
+  const hfHome = join(homedir(), ".cache", "huggingface");
+  return {
+    HF_HOME: hfHome,
+    HF_HUB_CACHE: join(hfHome, "hub")
+  };
+}
+
 function isExecutableFile(p: string): boolean {
   try {
     if (!statSync(p).isFile()) {

@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { EventEmitter } from "events";
 import { delimiter } from "path";
 import { Connection } from "./connection";
-import { augmentedPath, resolveExecutable } from "./resolveCommand";
+import { augmentedPath, defaultModelCacheEnv, resolveExecutable } from "./resolveCommand";
 
 /** Thrown when the agent executable cannot be located on the (augmented) PATH. */
 export class AgentNotFoundError extends Error {
@@ -79,8 +79,17 @@ export class AcpClient extends EventEmitter {
   spawn(config: AgentSpawnConfig): void {
     // GUI-launched VS Code inherits a minimal PATH; augment it so the agent
     // (and any subprocess it spawns) can be found and can find its own tools.
+    // Model-cache defaults sit *under* the inherited env and the agent config so
+    // a real HF_HOME/HF_HUB_CACHE (or an agent `env` entry) always wins; they
+    // only fill in a writable cache dir when nothing else is set, avoiding the
+    // EPERM that the App Group container would otherwise cause.
     const path = augmentedPath();
-    const env = { ...process.env, ...(config.env ?? {}), PATH: path };
+    const env = {
+      ...defaultModelCacheEnv(),
+      ...process.env,
+      ...(config.env ?? {}),
+      PATH: path
+    };
     if (config.env?.PATH) {
       env.PATH = `${config.env.PATH}${delimiter}${path}`;
     }
