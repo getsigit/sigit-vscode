@@ -13,6 +13,10 @@
   let currentAssistant = null;
   let busy = false;
 
+  // Tool calls arrive as tool_call -> tool_call_update sharing one toolCallId.
+  // Track each row by id so updates mutate it in place instead of stacking.
+  const toolEls = new Map();
+
   function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -39,6 +43,70 @@
 
   function endAssistant() {
     currentAssistant = null;
+  }
+
+  function parsePercent(title) {
+    const m = /\((\d+)%\)/.exec(title || "");
+    if (!m) {
+      return null;
+    }
+    const n = parseInt(m[1], 10);
+    return isNaN(n) ? null : Math.max(0, Math.min(100, n));
+  }
+
+  function stripPercent(title) {
+    return (title || "").replace(/\s*\(\d+%\)/, "").trim();
+  }
+
+  // Render (or update in place) a tool-call row keyed by toolCallId. A title
+  // like "Downloading … (42%)" is shown as a label plus a progress bar.
+  function renderTool(message) {
+    const key = message.toolCallId || null;
+    let entry = key ? toolEls.get(key) : null;
+
+    if (!entry) {
+      const el = document.createElement("div");
+      el.className = "message message-tool";
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      const labelEl = document.createElement("div");
+      labelEl.className = "tool-label";
+      const progress = document.createElement("div");
+      progress.className = "tool-progress";
+      progress.hidden = true;
+      const bar = document.createElement("div");
+      bar.className = "tool-progress-bar";
+      progress.appendChild(bar);
+      bubble.appendChild(labelEl);
+      bubble.appendChild(progress);
+      el.appendChild(bubble);
+      messagesEl.appendChild(el);
+      entry = { el, labelEl, progress, bar, title: "", status: "" };
+      if (key) {
+        toolEls.set(key, entry);
+      }
+    }
+
+    // Updates may omit fields; only overwrite what we were given.
+    if (typeof message.title === "string" && message.title) {
+      entry.title = message.title;
+    }
+    if (typeof message.status === "string" && message.status) {
+      entry.status = message.status;
+    }
+
+    const pct = parsePercent(entry.title);
+    const text = (pct === null ? entry.title : stripPercent(entry.title)) || "tool";
+    entry.labelEl.textContent = text + (entry.status ? " — " + entry.status : "");
+    entry.el.className = "message message-tool" + (entry.status ? " tool-" + entry.status : "");
+
+    if (pct === null) {
+      entry.progress.hidden = true;
+    } else {
+      entry.progress.hidden = false;
+      entry.bar.style.width = pct + "%";
+    }
+    scrollToBottom();
   }
 
   function setStatus(text) {
@@ -87,11 +155,9 @@
       case "thought":
         addMessage("thought", message.text || "");
         break;
-      case "tool": {
-        const label = message.title + (message.status ? " — " + message.status : "");
-        addMessage("tool", label);
+      case "tool":
+        renderTool(message);
         break;
-      }
       case "status":
         setStatus(message.text || "");
         break;
@@ -114,6 +180,7 @@
         break;
       case "clear":
         messagesEl.innerHTML = "";
+        toolEls.clear();
         endAssistant();
         break;
       default:
