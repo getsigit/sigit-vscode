@@ -69,26 +69,39 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     this.postStatus(`Agent restarted: ${this.activeAgentKey}`);
   }
 
-  /** Pick an agent from the registry and switch to it. */
+  /** Pick a configured agent — or browse the registry — and switch to it. */
   async selectAgent(): Promise<void> {
+    const browse = "$(cloud-download) Browse registry…";
     const agents = listAgents();
     const picked = await vscode.window.showQuickPick(
-      agents.map((agent) => ({
-        label: agent.name,
-        description: agent.key,
-        detail: `${agent.command} ${agent.args.join(" ")}`.trim(),
-        agent
-      })),
+      [
+        ...agents.map((agent) => ({
+          label: agent.name,
+          description: agent.key,
+          detail: `${agent.command} ${agent.args.join(" ")}`.trim(),
+          key: agent.key
+        })),
+        { label: browse, description: "", detail: "Discover and install ACP agents", key: undefined }
+      ],
       { placeHolder: "Select an ACP agent" }
     );
     if (!picked) {
       return;
     }
-    this.activeAgentKey = picked.agent.key;
+    if (picked.key === undefined) {
+      await vscode.commands.executeCommand("sigit.browseRegistry");
+      return;
+    }
+    await this.useAgent(picked.key);
+  }
+
+  /** Switch the active agent to `key`, restarting the session. */
+  async useAgent(key: string): Promise<void> {
+    this.activeAgentKey = key;
     this.disposeClient();
     this.post({ type: "clear" });
     await this.ensureClient();
-    this.postStatus(`Agent: ${picked.agent.name}`);
+    this.postStatus(`Agent: ${resolveAgent(key).name}`);
   }
 
   private async handlePrompt(text: string): Promise<void> {

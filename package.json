@@ -60,6 +60,16 @@
         "command": "sigit.restartAgent",
         "title": "siGit: Restart Agent",
         "category": "siGit"
+      },
+      {
+        "command": "sigit.browseRegistry",
+        "title": "siGit: Browse Agent Registry",
+        "category": "siGit"
+      },
+      {
+        "command": "sigit.refreshRegistry",
+        "title": "siGit: Refresh Agent Registry",
+        "category": "siGit"
       }
     ],
     "viewsContainers": {
@@ -87,6 +97,11 @@
           "type": "string",
           "default": "sigit",
           "markdownDescription": "Key of the agent to use by default, looked up in `#sigit.agents#`. Defaults to the on-device `sigit` binary."
+        },
+        "sigit.registry.url": {
+          "type": "string",
+          "default": "https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json",
+          "markdownDescription": "URL of the [Agent Client Protocol registry](https://github.com/agentclientprotocol/registry) catalog used by **siGit: Browse Agent Registry**. Installing an agent only registers a launch command in `#sigit.agents#` (via `npx`/`uvx`, or a binary you place on your PATH); siGit never downloads or runs agent binaries on your behalf."
         },
         "sigit.agents": {
           "type": "object",
@@ -155,6 +170,8 @@
     "compile": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "test:smoke": "node test/smoke.mjs",
+    "test:registry": "node test/registry.mjs",
+    "test": "npm run test:registry && npm run test:smoke",
     "package": "vsce package"
   },
   "devDependencies": {
