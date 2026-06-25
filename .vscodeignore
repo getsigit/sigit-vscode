@@ -1,8 +1,11 @@
 .vscode/**
 .github/**
+.claude/**
 src/**
 test/**
 node_modules/**
+pnpm-lock.yaml
+pnpm-workspace.yaml
 **/*.ts
 **/*.map
 esbuild.js

@@ -5,6 +5,24 @@ All notable changes to the **siGit Code** extension are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-06-26
+
+### Fixed
+
+- Model load failed with `Operation not permitted (os error 1)` (EPERM) when the
+  agent ran outside the Onde Inference app. The `sigit` agent redirects its
+  HuggingFace cache into a macOS App Group container that only entitled,
+  app-sandboxed processes may write to; a `sigit` spawned by VS Code has no such
+  entitlement. The extension now passes writable `HF_HOME` / `HF_HUB_CACHE`
+  defaults (`~/.cache/huggingface`) so model downloads land in a directory the
+  editor's child process can write to. A real `HF_HOME`/`HF_HUB_CACHE` env var or
+  an agent `env` entry still takes precedence.
+
+### Changed
+
+- Packaging now excludes `.claude/` and lockfiles from the VSIX, shrinking the
+  bundle and preventing stray worktree copies from being shipped.
+
 ## [1.0.1] - 2026-06-25
 
 ### Fixed
