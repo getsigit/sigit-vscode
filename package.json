@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "publisher": "getsigit",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
   "homepage": "https://code.sigit.si",
   "//icon": "TODO: add media/icon.png (128x128) before publishing, then set \"icon\": \"media/icon.png\"",
   "repository": {
