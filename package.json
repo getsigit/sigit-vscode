@@ -153,6 +153,7 @@
     "watch": "node esbuild.js --watch",
     "compile": "tsc --noEmit",
     "lint": "eslint src --ext ts",
+    "test:smoke": "node test/smoke.mjs",
     "package": "vsce package"
   },
   "devDependencies": {

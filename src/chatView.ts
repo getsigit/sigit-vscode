@@ -271,9 +271,12 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     if (typeof content === "string") {
       return content;
     }
+    if (Array.isArray(content)) {
+      return content.map((c) => this.contentText(c)).join("");
+    }
     if (content && typeof content === "object") {
       const c = content as { type?: string; text?: string };
-      if (c.type === "text" && typeof c.text === "string") {
+      if (typeof c.text === "string") {
         return c.text;
       }
     }
