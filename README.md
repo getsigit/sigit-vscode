@@ -109,4 +109,4 @@ npm run package     # vsce package (.vsix)
 
 ## License
 
-[MIT](./LICENSE) © 2026 siGit
+[MIT](./LICENSE) © 2026 siGit Code & Deploy

@@ -2,7 +2,7 @@
   "name": "sigit-code",
   "displayName": "siGit Code — On-device AI Coding Agent",
   "description": "Local-first AI coding agent for VS Code. Runs the on-device sigit agent, and other ACP-compatible agents, over stdio.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "getsigit",
   "license": "MIT",
   "homepage": "https://code.sigit.si",
