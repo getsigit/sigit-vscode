@@ -1,6 +1,21 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { EventEmitter } from "events";
+import { delimiter } from "path";
 import { Connection } from "./connection";
+import { augmentedPath, resolveExecutable } from "./resolveCommand";
+
+/** Thrown when the agent executable cannot be located on the (augmented) PATH. */
+export class AgentNotFoundError extends Error {
+  readonly code = "AGENT_NOT_FOUND";
+  constructor(readonly command: string) {
+    super(
+      `Could not find the "${command}" executable. Install the agent from ` +
+        `https://code.sigit.si and make sure it is on your PATH, or set an ` +
+        `absolute "command" path in the "sigit.agents" setting.`
+    );
+    this.name = "AgentNotFoundError";
+  }
+}
 
 /**
  * AcpClient — spawns an Agent Client Protocol agent over stdio and drives the
@@ -62,14 +77,30 @@ export class AcpClient extends EventEmitter {
 
   /** Spawn the agent process and wire up the JSON-RPC connection. */
   spawn(config: AgentSpawnConfig): void {
-    const env = { ...process.env, ...(config.env ?? {}) };
-    const child = spawn(config.command, config.args ?? [], {
+    // GUI-launched VS Code inherits a minimal PATH; augment it so the agent
+    // (and any subprocess it spawns) can be found and can find its own tools.
+    const path = augmentedPath();
+    const env = { ...process.env, ...(config.env ?? {}), PATH: path };
+    if (config.env?.PATH) {
+      env.PATH = `${config.env.PATH}${delimiter}${path}`;
+    }
+
+    const resolved = resolveExecutable(config.command, env.PATH);
+    if (!resolved) {
+      throw new AgentNotFoundError(config.command);
+    }
+
+    const child = spawn(resolved, config.args ?? [], {
       cwd: config.cwd,
       env,
       stdio: ["pipe", "pipe", "pipe"]
     });
 
-    child.on("error", (err) => this.emit("error", err));
+    child.on("error", (err) => {
+      this.emit("error", err);
+      // Unblock any in-flight request (e.g. initialize) instead of hanging.
+      this.connection?.dispose();
+    });
     child.on("exit", (code, signal) => this.emit("exit", code, signal));
     child.stderr.on("data", (chunk: Buffer) => this.emit("stderr", chunk.toString()));
 

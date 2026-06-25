@@ -35,3 +35,6 @@ jobs:
 
       - name: Smoke test (ACP round-trip)
         run: pnpm run test:smoke
+
+      - name: Webview test (tool-call rendering)
+        run: pnpm run test:webview
