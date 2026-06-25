@@ -1,0 +1,131 @@
+:root {
+  --sigit-gap: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-sideBar-background);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sigit-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sigit-gap);
+}
+
+.message {
+  display: flex;
+}
+
+.message-user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 92%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.message-user .bubble {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.message-assistant .bubble {
+  background-color: var(--vscode-editor-inactiveSelectionBackground);
+  color: var(--vscode-foreground);
+}
+
+.message-thought .bubble {
+  background-color: transparent;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+  border-left: 2px solid var(--vscode-panel-border);
+  border-radius: 0;
+}
+
+.message-tool .bubble {
+  background-color: transparent;
+  color: var(--vscode-descriptionForeground);
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.9em;
+  border: 1px solid var(--vscode-panel-border);
+}
+
+.message-error .bubble {
+  background-color: var(--vscode-inputValidation-errorBackground);
+  color: var(--vscode-foreground);
+  border: 1px solid var(--vscode-inputValidation-errorBorder);
+}
+
+.status {
+  padding: 2px var(--sigit-gap);
+  font-size: 0.85em;
+  color: var(--vscode-descriptionForeground);
+  min-height: 1.2em;
+}
+
+.composer {
+  display: flex;
+  gap: var(--sigit-gap);
+  padding: var(--sigit-gap);
+  border-top: 1px solid var(--vscode-panel-border);
+}
+
+.input {
+  flex: 1;
+  resize: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--vscode-input-foreground);
+  background-color: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: 4px;
+  padding: 6px 8px;
+}
+
+.input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+.send {
+  align-self: flex-end;
+  color: var(--vscode-button-foreground);
+  background-color: var(--vscode-button-background);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.send:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.send:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

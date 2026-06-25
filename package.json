@@ -1,0 +1,168 @@
+{
+  "name": "sigit-code",
+  "displayName": "siGit Code — On-device AI Coding Agent",
+  "description": "Local-first AI coding agent for VS Code. Runs the on-device sigit agent, and other ACP-compatible agents, over stdio.",
+  "version": "0.0.1",
+  "publisher": "getsigit",
+  "license": "MIT",
+  "homepage": "https://code.sigit.si",
+  "//icon": "TODO: add media/icon.png (128x128) before publishing, then set \"icon\": \"media/icon.png\"",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getsigit/sigit-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/getsigit/sigit-vscode/issues"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "acp",
+    "agent client protocol",
+    "ai",
+    "coding agent",
+    "local llm",
+    "on-device",
+    "gguf",
+    "offline",
+    "claude code",
+    "gemini",
+    "copilot alternative"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "sigit.openChat",
+        "title": "siGit: Open Chat",
+        "category": "siGit"
+      },
+      {
+        "command": "sigit.newSession",
+        "title": "siGit: New Session",
+        "category": "siGit"
+      },
+      {
+        "command": "sigit.selectAgent",
+        "title": "siGit: Select Agent",
+        "category": "siGit"
+      },
+      {
+        "command": "sigit.restartAgent",
+        "title": "siGit: Restart Agent",
+        "category": "siGit"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sigit",
+          "title": "siGit Code",
+          "icon": "media/activity-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "sigit": [
+        {
+          "type": "webview",
+          "id": "sigit.chat",
+          "name": "Chat"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "siGit Code",
+      "properties": {
+        "sigit.agent.default": {
+          "type": "string",
+          "default": "sigit",
+          "markdownDescription": "Key of the agent to use by default, looked up in `#sigit.agents#`. Defaults to the on-device `sigit` binary."
+        },
+        "sigit.agents": {
+          "type": "object",
+          "markdownDescription": "Registry of ACP agents that siGit Code can spawn. Each entry maps a key to an agent definition. The on-device `sigit` agent is the local-first default; add other ACP-compatible agents here.",
+          "default": {
+            "sigit": {
+              "name": "siGit (on-device)",
+              "command": "sigit",
+              "args": [],
+              "env": {}
+            }
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Human-readable display name."
+              },
+              "command": {
+                "type": "string",
+                "description": "Executable to spawn (on PATH or an absolute path)."
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Arguments passed to the agent binary."
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Extra environment variables for the agent process."
+              }
+            },
+            "required": [
+              "command"
+            ]
+          }
+        },
+        "sigit.permission.mode": {
+          "type": "string",
+          "enum": [
+            "prompt",
+            "allow",
+            "deny"
+          ],
+          "enumDescriptions": [
+            "Ask before every agent-requested action.",
+            "Automatically allow agent-requested actions.",
+            "Automatically deny agent-requested actions."
+          ],
+          "default": "prompt",
+          "description": "How to handle permission requests from the agent (file writes, tool calls, etc.)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "compile": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/vsce": "^2.24.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.0"
+  }
+}
