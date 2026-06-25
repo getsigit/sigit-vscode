@@ -181,7 +181,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       case "tool_call_update":
         this.post({
           type: "tool",
-          title: (inner.title as string) ?? (inner.kind as string) ?? "tool",
+          // May be undefined on an update; the webview keeps the prior label
+          // and only mutates status/progress in that case.
+          title: (inner.title as string | undefined) ?? (inner.kind as string | undefined),
           status: (inner.status as string) ?? "",
           toolCallId: inner.toolCallId as string | undefined
         });

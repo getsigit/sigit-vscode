@@ -94,6 +94,36 @@ body {
   font-family: var(--vscode-editor-font-family, monospace);
   font-size: 0.9em;
   border: 1px solid var(--vscode-panel-border);
+  min-width: 180px;
+}
+
+.tool-label {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tool-progress {
+  margin-top: 6px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--vscode-input-background);
+  overflow: hidden;
+}
+
+.tool-progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: var(--vscode-progressBar-background);
+  transition: width 0.2s ease;
+}
+
+.message-tool.tool-completed .bubble {
+  border-color: var(--vscode-testing-iconPassed, #89d185);
+}
+
+.message-tool.tool-failed .bubble {
+  border-color: var(--vscode-inputValidation-errorBorder);
+  color: var(--vscode-foreground);
 }
 
 .message-error .bubble {
