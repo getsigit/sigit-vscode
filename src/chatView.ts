@@ -271,9 +271,12 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     if (typeof content === "string") {
       return content;
     }
+    if (Array.isArray(content)) {
+      return content.map((c) => this.contentText(c)).join("");
+    }
     if (content && typeof content === "object") {
       const c = content as { type?: string; text?: string };
-      if (c.type === "text" && typeof c.text === "string") {
+      if (typeof c.text === "string") {
         return c.text;
       }
     }
@@ -305,8 +308,12 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.context.extensionUri, "media", "main.css")
     );
+    const logoUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.context.extensionUri, "media", "icon.png")
+    );
     const csp = [
       `default-src 'none'`,
+      `img-src ${webview.cspSource}`,
       `style-src ${webview.cspSource}`,
       `script-src 'nonce-${nonce}'`,
       `font-src ${webview.cspSource}`
@@ -322,6 +329,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   <title>siGit Chat</title>
 </head>
 <body>
+  <header class="brand">
+    <img class="brand-logo" src="${logoUri}" alt="" />
+    <span class="brand-name">siGit Code</span>
+  </header>
   <div id="messages" class="messages"></div>
   <div id="status" class="status"></div>
   <form id="composer" class="composer">

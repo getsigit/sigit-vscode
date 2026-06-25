@@ -92,21 +92,24 @@ Then run **`siGit: Select Agent`** to switch between them.
 
 ## Development
 
+This project uses [pnpm](https://pnpm.io).
+
 ```bash
-npm install
-npm run watch       # esbuild in watch mode
+pnpm install
+pnpm run watch       # esbuild in watch mode
 # Press F5 to launch the Extension Development Host
 ```
 
 Other scripts:
 
 ```bash
-npm run compile     # tsc --noEmit type check
-npm run lint        # eslint
-npm run build       # production bundle (esbuild)
-npm run package     # vsce package (.vsix)
+pnpm run compile     # tsc --noEmit type check
+pnpm run lint        # eslint
+pnpm run build       # production bundle (esbuild)
+pnpm run test:smoke  # ACP round-trip against a mock agent
+pnpm run package     # vsce package (.vsix)
 ```
 
 ## License
 
-[MIT](./LICENSE) © 2026 siGit
+[MIT](./LICENSE) © 2026 siGit Code & Deploy

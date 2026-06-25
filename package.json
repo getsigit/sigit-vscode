@@ -2,11 +2,12 @@
   "name": "sigit-code",
   "displayName": "siGit Code — On-device AI Coding Agent",
   "description": "Local-first AI coding agent for VS Code. Runs the on-device sigit agent, and other ACP-compatible agents, over stdio.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "getsigit",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
   "homepage": "https://code.sigit.si",
-  "//icon": "TODO: add media/icon.png (128x128) before publishing, then set \"icon\": \"media/icon.png\"",
+  "icon": "media/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/getsigit/sigit-vscode"
@@ -153,6 +154,7 @@
     "watch": "node esbuild.js --watch",
     "compile": "tsc --noEmit",
     "lint": "eslint src --ext ts",
+    "test:smoke": "node test/smoke.mjs",
     "package": "vsce package"
   },
   "devDependencies": {
@@ -160,7 +162,7 @@
     "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@vscode/vsce": "^2.24.0",
+    "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.20.0",
     "eslint": "^8.57.0",
     "typescript": "^5.4.0"

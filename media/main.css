@@ -22,6 +22,28 @@ body {
   background-color: var(--vscode-sideBar-background);
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px var(--sigit-gap);
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.brand-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex: none;
+}
+
+.brand-name {
+  font-weight: 600;
+  /* Preserve the brand's mixed case; VS Code uppercases the platform header,
+     but this is our own surface. */
+  text-transform: none;
+}
+
 .messages {
   flex: 1;
   overflow-y: auto;

@@ -5,11 +5,11 @@ All notable changes to the **siGit Code** extension are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2026-06-25
 
 ### Added
 
-- Initial scaffold: ACP (Agent Client Protocol) client extension for siGit Code.
+- Initial release: ACP (Agent Client Protocol) client extension for siGit Code.
 - On-device `sigit` agent as the local-first default.
 - JSON-RPC 2.0 peer over newline-delimited JSON for ACP transport.
 - ACP handshake (`initialize` → `session/new` → `session/prompt`) with streaming
