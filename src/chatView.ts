@@ -69,26 +69,39 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     this.postStatus(`Agent restarted: ${this.activeAgentKey}`);
   }
 
-  /** Pick an agent from the registry and switch to it. */
+  /** Pick a configured agent — or browse the registry — and switch to it. */
   async selectAgent(): Promise<void> {
+    const browse = "$(cloud-download) Browse registry…";
     const agents = listAgents();
     const picked = await vscode.window.showQuickPick(
-      agents.map((agent) => ({
-        label: agent.name,
-        description: agent.key,
-        detail: `${agent.command} ${agent.args.join(" ")}`.trim(),
-        agent
-      })),
+      [
+        ...agents.map((agent) => ({
+          label: agent.name,
+          description: agent.key,
+          detail: `${agent.command} ${agent.args.join(" ")}`.trim(),
+          key: agent.key
+        })),
+        { label: browse, description: "", detail: "Discover and install ACP agents", key: undefined }
+      ],
       { placeHolder: "Select an ACP agent" }
     );
     if (!picked) {
       return;
     }
-    this.activeAgentKey = picked.agent.key;
+    if (picked.key === undefined) {
+      await vscode.commands.executeCommand("sigit.browseRegistry");
+      return;
+    }
+    await this.useAgent(picked.key);
+  }
+
+  /** Switch the active agent to `key`, restarting the session. */
+  async useAgent(key: string): Promise<void> {
+    this.activeAgentKey = key;
     this.disposeClient();
     this.post({ type: "clear" });
     await this.ensureClient();
-    this.postStatus(`Agent: ${picked.agent.name}`);
+    this.postStatus(`Agent: ${resolveAgent(key).name}`);
   }
 
   private async handlePrompt(text: string): Promise<void> {
@@ -99,7 +112,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     try {
       await this.ensureClient();
     } catch (err) {
-      this.postError(`Failed to start agent: ${(err as Error).message}`);
+      this.reportAgentError(err as Error, resolveAgent(this.activeAgentKey).command);
       return;
     }
     if (!this.client) {
@@ -145,7 +158,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
     client.on("update", (update: SessionUpdate) => this.handleUpdate(update));
     client.on("stderr", (chunk: string) => this.post({ type: "log", text: chunk }));
-    client.on("error", (err: Error) => this.postError(`Agent error: ${err.message}`));
+    client.on("error", (err: Error) => this.reportAgentError(err, agent.command));
     client.on("exit", (code: number | null) => {
       this.postStatus(`Agent exited${code === null ? "" : ` (code ${code})`}`);
       if (this.client === client) {
@@ -181,7 +194,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       case "tool_call_update":
         this.post({
           type: "tool",
-          title: (inner.title as string) ?? (inner.kind as string) ?? "tool",
+          // May be undefined on an update; the webview keeps the prior label
+          // and only mutates status/progress in that case.
+          title: (inner.title as string | undefined) ?? (inner.kind as string | undefined),
           status: (inner.status as string) ?? "",
           toolCallId: inner.toolCallId as string | undefined
         });
@@ -293,6 +308,37 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
   private postError(text: string): void {
     this.post({ type: "error", text });
+  }
+
+  /**
+   * Surface an agent failure in the chat and, for a missing binary, raise a
+   * modal with one-click actions (open settings / install docs). ENOENT here
+   * almost always means the `command` isn't on the PATH the editor inherited.
+   */
+  private reportAgentError(err: Error, command: string): void {
+    const code = (err as { code?: string }).code;
+    const notFound = code === "AGENT_NOT_FOUND" || code === "ENOENT";
+    if (notFound) {
+      const message =
+        `Couldn't launch the "${command}" agent — the executable wasn't found. ` +
+        `Install it from code.sigit.si and ensure it's on your PATH, or set an ` +
+        `absolute path in the "sigit.agents" setting.`;
+      this.postError(message);
+      void this.offerAgentSetup(message);
+      return;
+    }
+    this.postError(`Agent error: ${err.message}`);
+  }
+
+  private async offerAgentSetup(message: string): Promise<void> {
+    const openSettings = "Open Settings";
+    const installGuide = "Install Guide";
+    const choice = await vscode.window.showErrorMessage(message, openSettings, installGuide);
+    if (choice === openSettings) {
+      await vscode.commands.executeCommand("workbench.action.openSettings", "sigit.agents");
+    } else if (choice === installGuide) {
+      await vscode.env.openExternal(vscode.Uri.parse("https://code.sigit.si"));
+    }
   }
 
   private disposeClient(): void {
