@@ -110,6 +110,32 @@ pnpm run test:smoke  # ACP round-trip against a mock agent
 pnpm run package     # vsce package (.vsix)
 ```
 
+## Releasing
+
+Publishing is automated by [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
+It runs the test suite, packages one `.vsix`, and publishes that same file to the
+VS Code Marketplace (`vsce`) and Open VSX (`ovsx`).
+
+One-time setup, stored as repository secrets:
+
+- `VSCE_PAT`: an Azure DevOps personal access token for the `getsigit`
+  Marketplace publisher (Marketplace > Manage scope).
+- `OVSX_PAT`: an access token for the `getsigit` namespace on
+  [open-vsx.org](https://open-vsx.org). The workflow creates the namespace on
+  first publish if it does not exist.
+
+To cut a release:
+
+1. Bump `version` in `package.json` and add a `CHANGELOG.md` entry.
+2. Push to `main`, then create a GitHub Release whose tag is `v<version>` (for
+   example `v1.0.1`). The workflow checks the tag against `package.json` and
+   fails on a mismatch.
+3. The release publishes to both registries and attaches the `.vsix` to the
+   GitHub Release.
+
+To test packaging without publishing, run the workflow manually from the Actions
+tab with **publish** left unchecked. It uploads the `.vsix` as a build artifact.
+
 ## License
 
 [MIT](./LICENSE) © 2026 siGit Code & Deploy
