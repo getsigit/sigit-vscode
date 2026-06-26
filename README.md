@@ -1,11 +1,13 @@
-# siGit Code — On-device AI Coding Agent
+# siGit Code: on-device AI coding agent
 
-**Your code never has to leave your machine.** siGit Code is a local-first AI
-coding agent for VS Code. It runs the on-device [`sigit`](https://code.sigit.si)
-agent, a quantized (GGUF) model that executes entirely on your hardware and
-works offline, and brings it into the editor as a chat-driven pair programmer.
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/getsigit.sigit-code?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=getsigit.sigit-code)
 
-There are no cloud round-trips and no API keys for the default agent. The model
+Your code never has to leave your machine. siGit Code is a local-first AI
+coding agent for VS Code. It runs the on-device [`sigit`](https://github.com/getsigit/sigit)
+agent, a quantized (GGUF) model that runs entirely on your hardware and works
+offline, and brings it into the editor as a chat interface.
+
+The default agent needs no API keys and makes no cloud round-trips. The model
 lives on your device, and so does your code.
 
 siGit Code also speaks the open [Agent Client
@@ -16,7 +18,7 @@ ACP-compatible agents over stdio. The on-device agent is still the point.
 
 - Your prompts and file contents stay on your machine.
 - It works offline, including on a plane or behind an air gap.
-- There is no per-token billing, so you can run it as much as your hardware allows.
+- No per-token billing, so you can run it as much as your hardware allows.
 - You choose the model and the weights, and they do not change underneath you.
 
 ACP and multi-agent support are there for when you need a hosted agent. They are
@@ -26,16 +28,16 @@ not the headline.
 
 - VS Code `^1.90.0`
 - The `sigit` binary on your `PATH`.
-  Install it from [code.sigit.si](https://code.sigit.si).
+  Install it from [github.com/getsigit/sigit](https://github.com/getsigit/sigit).
 
 > siGit Code only *spawns* the `sigit` binary over ACP, so it has no build-time
 > dependency on the agent. Install the agent separately.
 
 ## Getting started
 
-1. Install the `sigit` agent (see [code.sigit.si](https://code.sigit.si)) and
+1. Install the `sigit` agent (see [github.com/getsigit/sigit](https://github.com/getsigit/sigit)) and
    confirm `sigit` runs from your terminal.
-2. Install this extension.
+2. Install this extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=getsigit.sigit-code).
 3. Click the **siGit Code** icon in the Activity Bar to open the chat view.
 4. Type a prompt and press **Enter**. The extension spawns the agent, opens a
    session in your workspace folder, and streams the response.
