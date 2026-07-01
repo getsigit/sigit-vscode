@@ -1,6 +1,7 @@
 # siGit Code: on-device AI coding agent
 
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/getsigit.sigit-code?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=getsigit.sigit-code)
+[![VS Code Marketplace](https://vsmarketplacebadges.dev/version-short/getsigit.sigit-code.svg)](https://marketplace.visualstudio.com/items?itemName=getsigit.sigit-code)
+[![Open VSX](https://img.shields.io/open-vsx/v/getsigit/sigit-code)](https://open-vsx.org/extension/getsigit/sigit-code)
 
 Your code never has to leave your machine. siGit Code is a local-first AI
 coding agent for VS Code. It runs the on-device [`sigit`](https://github.com/getsigit/sigit)
@@ -13,6 +14,10 @@ lives on your device, and so does your code.
 siGit Code also speaks the open [Agent Client
 Protocol](https://agentclientprotocol.com) (ACP), so it can drive other
 ACP-compatible agents over stdio. The on-device agent is still the point.
+
+siGit Code's home is [code.sigit.si](https://code.sigit.si), where you can also
+find the hosted version (siGit Code Cloud). [sigit.si](https://sigit.si) is Git
+hosting built for AI workflows.
 
 ## Why local-first
 
@@ -141,3 +146,7 @@ tab with **publish** left unchecked. It uploads the `.vsix` as a build artifact.
 ## License
 
 [MIT](./LICENSE) © 2026 siGit Code & Deploy
+
+## Copyright
+
+© 2026 [Splitfire AB](https://5mb.app) ([siGit Code & Deploy](https://sigit.si)).
