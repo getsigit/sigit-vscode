@@ -149,4 +149,4 @@ tab with **publish** left unchecked. It uploads the `.vsix` as a build artifact.
 
 ## Copyright
 
-© 2026 [smbCloud Platform](https://smbcloud.xyz/) (Splitfire AB).
+© 2026 [Splitfire AB](https://5mb.app) ([siGit Code & Deploy](https://sigit.si)).
