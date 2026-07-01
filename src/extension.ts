@@ -1,7 +1,17 @@
 import * as vscode from "vscode";
+import { listAgents } from "./agents";
 import { ChatViewProvider } from "./chatView";
 import { RegistryAgent } from "./catalog";
-import { fetchCatalog, installAgent, installedKeys, setDefaultAgent } from "./registry";
+import {
+  fetchCatalog,
+  installAgent,
+  installedKeys,
+  setDefaultAgent,
+  uninstallAgent
+} from "./registry";
+
+/** The always-available on-device agent; never removable. */
+const FALLBACK_AGENT_KEY = "sigit";
 
 export function activate(context: vscode.ExtensionContext): void {
   const provider = new ChatViewProvider(context);
@@ -21,7 +31,8 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand("sigit.selectAgent", () => provider.selectAgent()),
     vscode.commands.registerCommand("sigit.restartAgent", () => provider.restart()),
     vscode.commands.registerCommand("sigit.browseRegistry", () => browseRegistry(context, provider)),
-    vscode.commands.registerCommand("sigit.refreshRegistry", () => refreshRegistry(context))
+    vscode.commands.registerCommand("sigit.refreshRegistry", () => refreshRegistry(context)),
+    vscode.commands.registerCommand("sigit.removeAgent", () => removeAgent(provider))
   );
 }
 
@@ -93,6 +104,22 @@ async function browseRegistry(
         `Installed "${agent.name}" — launches via ${agent.distribution}.`
       );
     }
+  } else {
+    const update = "Update";
+    const choice = await vscode.window.showInformationMessage(
+      `"${agent.name}" is already installed. Update its launch command from the registry?`,
+      update
+    );
+    if (choice === update) {
+      await installAgent(agent, { overwrite: true });
+      void vscode.window.showInformationMessage(
+        `Updated "${agent.name}"${agent.version ? ` to v${agent.version}` : ""}.`
+      );
+      // A running client may hold the stale command; restart if it's the active one.
+      if (provider.currentAgentKey === agent.key) {
+        await provider.useAgent(agent.key);
+      }
+    }
   }
 
   await offerToUse(agent, provider);
@@ -112,6 +139,52 @@ async function offerToUse(agent: RegistryAgent, provider: ChatViewProvider): Pro
   }
   if (choice === useNow || choice === setDefault) {
     await provider.useAgent(agent.key);
+  }
+}
+
+/** Pick an installed agent and remove it from `sigit.agents`. */
+async function removeAgent(provider: ChatViewProvider): Promise<void> {
+  const removable = listAgents().filter((agent) => agent.key !== FALLBACK_AGENT_KEY);
+  if (removable.length === 0) {
+    void vscode.window.showInformationMessage(
+      "No removable agents — only the on-device siGit agent is registered."
+    );
+    return;
+  }
+
+  const picked = await vscode.window.showQuickPick(
+    removable.map((agent) => ({
+      label: agent.name,
+      description: agent.key,
+      detail: `${agent.command} ${agent.args.join(" ")}`.trim(),
+      key: agent.key
+    })),
+    { placeHolder: "Select an agent to remove from your configuration" }
+  );
+  if (!picked) {
+    return;
+  }
+
+  const confirm = "Remove";
+  const choice = await vscode.window.showWarningMessage(
+    `Remove "${picked.label}" from your agent registry? This only unregisters it; no files are deleted.`,
+    { modal: true },
+    confirm
+  );
+  if (choice !== confirm) {
+    return;
+  }
+
+  const wasActive = provider.currentAgentKey === picked.key;
+  const removed = await uninstallAgent(picked.key);
+  if (!removed) {
+    void vscode.window.showWarningMessage(`"${picked.label}" was not in the registry.`);
+    return;
+  }
+  void vscode.window.showInformationMessage(`Removed "${picked.label}".`);
+  // If the removed agent was the one running, fall back to the on-device default.
+  if (wasActive) {
+    await provider.useAgent(FALLBACK_AGENT_KEY);
   }
 }
 

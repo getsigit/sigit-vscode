@@ -34,7 +34,7 @@ function config(): vscode.WorkspaceConfiguration {
   return vscode.workspace.getConfiguration("sigit");
 }
 
-/** The configured registry URL, or the built-in siGit catalog. */
+/** The configured registry URL, or the default Agent Client Protocol catalog. */
 export function registryUrl(): string {
   const configured = config().get<string>("registry.url");
   return configured && configured.trim() !== "" ? configured.trim() : DEFAULT_REGISTRY_URL;
@@ -89,13 +89,18 @@ export async function fetchCatalog(context: vscode.ExtensionContext): Promise<Fe
 }
 
 /**
- * Register a catalog agent into the user's `sigit.agents` configuration. Returns
- * `false` without writing when an agent with the same key is already installed.
+ * Register a catalog agent into the user's `sigit.agents` configuration. By
+ * default this is install-only: it returns `false` without writing when an
+ * agent with the same key is already present. Pass `overwrite: true` to update
+ * an existing entry in place (e.g. to pick up a newer catalog version).
  */
-export async function installAgent(agent: RegistryAgent): Promise<boolean> {
+export async function installAgent(
+  agent: RegistryAgent,
+  options: { overwrite?: boolean } = {}
+): Promise<boolean> {
   const cfg = config();
   const registry = { ...(cfg.get<Record<string, unknown>>("agents") ?? {}) };
-  if (Object.prototype.hasOwnProperty.call(registry, agent.key)) {
+  if (!options.overwrite && Object.prototype.hasOwnProperty.call(registry, agent.key)) {
     return false;
   }
   registry[agent.key] = {
@@ -105,6 +110,25 @@ export async function installAgent(agent: RegistryAgent): Promise<boolean> {
     env: agent.env
   };
   await cfg.update("agents", registry, vscode.ConfigurationTarget.Global);
+  return true;
+}
+
+/**
+ * Remove an agent from the user's `sigit.agents` configuration. Returns `false`
+ * when no entry with that key exists. When the removed agent was the configured
+ * default, the default is cleared so it falls back to the on-device `sigit`.
+ */
+export async function uninstallAgent(key: string): Promise<boolean> {
+  const cfg = config();
+  const registry = { ...(cfg.get<Record<string, unknown>>("agents") ?? {}) };
+  if (!Object.prototype.hasOwnProperty.call(registry, key)) {
+    return false;
+  }
+  delete registry[key];
+  await cfg.update("agents", registry, vscode.ConfigurationTarget.Global);
+  if (cfg.get<string>("agent.default") === key) {
+    await cfg.update("agent.default", undefined, vscode.ConfigurationTarget.Global);
+  }
   return true;
 }
 

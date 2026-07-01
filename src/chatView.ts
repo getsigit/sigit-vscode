@@ -53,6 +53,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     this.view?.show?.(true);
   }
 
+  /** The key of the agent currently backing this view. */
+  get currentAgentKey(): string {
+    return this.activeAgentKey;
+  }
+
   /** Start a fresh session, discarding any existing client. */
   async newSession(): Promise<void> {
     this.disposeClient();

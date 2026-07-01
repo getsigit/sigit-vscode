@@ -44,34 +44,80 @@
       {
         "command": "sigit.openChat",
         "title": "siGit: Open Chat",
-        "category": "siGit"
+        "category": "siGit",
+        "icon": "$(comment-discussion)"
       },
       {
         "command": "sigit.newSession",
         "title": "siGit: New Session",
-        "category": "siGit"
+        "category": "siGit",
+        "icon": "$(add)"
       },
       {
         "command": "sigit.selectAgent",
         "title": "siGit: Select Agent",
-        "category": "siGit"
+        "category": "siGit",
+        "icon": "$(server-process)"
       },
       {
         "command": "sigit.restartAgent",
         "title": "siGit: Restart Agent",
-        "category": "siGit"
+        "category": "siGit",
+        "icon": "$(debug-restart)"
       },
       {
         "command": "sigit.browseRegistry",
         "title": "siGit: Browse Agent Registry",
-        "category": "siGit"
+        "category": "siGit",
+        "icon": "$(cloud-download)"
       },
       {
         "command": "sigit.refreshRegistry",
         "title": "siGit: Refresh Agent Registry",
-        "category": "siGit"
+        "category": "siGit",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "sigit.removeAgent",
+        "title": "siGit: Remove Agent",
+        "category": "siGit",
+        "icon": "$(trash)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "sigit.newSession",
+          "when": "view == sigit.chat",
+          "group": "navigation@1"
+        },
+        {
+          "command": "sigit.selectAgent",
+          "when": "view == sigit.chat",
+          "group": "navigation@2"
+        },
+        {
+          "command": "sigit.browseRegistry",
+          "when": "view == sigit.chat",
+          "group": "1_agents@1"
+        },
+        {
+          "command": "sigit.refreshRegistry",
+          "when": "view == sigit.chat",
+          "group": "1_agents@2"
+        },
+        {
+          "command": "sigit.removeAgent",
+          "when": "view == sigit.chat",
+          "group": "1_agents@3"
+        },
+        {
+          "command": "sigit.restartAgent",
+          "when": "view == sigit.chat",
+          "group": "2_session@1"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {
