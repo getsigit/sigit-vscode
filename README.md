@@ -53,8 +53,15 @@ Commands (Command Palette):
 | --- | --- |
 | `siGit: Open Chat` | Reveal the chat view. |
 | `siGit: New Session` | Start a fresh session with the active agent. |
-| `siGit: Select Agent` | Pick an agent from the registry. |
+| `siGit: Select Agent` | Pick a configured agent (or browse the registry) and switch to it. |
 | `siGit: Restart Agent` | Restart the active agent process. |
+| `siGit: Browse Agent Registry` | Fetch the ACP registry, install an agent, and optionally use or default to it. |
+| `siGit: Refresh Agent Registry` | Force a fresh fetch of the registry catalog. |
+| `siGit: Remove Agent` | Unregister an installed agent from `sigit.agents`. |
+
+The chat view's title bar also surfaces **New Session** and **Select Agent** inline,
+with the registry commands (Browse / Refresh / Remove) and **Restart Agent** in the
+`⋯` overflow menu.
 
 ## Configuration
 
@@ -145,7 +152,7 @@ tab with **publish** left unchecked. It uploads the `.vsix` as a build artifact.
 
 ## License
 
-[MIT](./LICENSE) © 2026 siGit Code & Deploy
+[MIT](./LICENSE)
 
 ## Copyright
 
